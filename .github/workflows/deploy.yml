@@ -1,0 +1,28 @@
+name: Request deployment
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-python@v2
+        with:
+          python-version: "3.9.1"
+      - name: Request deploy script
+        run: |
+          wget https://raw.githubusercontent.com/pythonpizza/infrastructure/main/script/request-deploy/request-deploy-setup.sh
+          chmod +x ./request-deploy-setup.sh
+          ./request-deploy-setup.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.BOT_TOKEN }}
+          SHA: ${{ github.sha }}
+          REPOSITORY_NAME: ${{ github.event.repository.name }}
+          PR_NUMBER: ${{ github.event.number }}
+          EVENT_NAME: ${{ github.event_name }}
